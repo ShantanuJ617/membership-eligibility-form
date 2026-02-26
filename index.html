@@ -1,84 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Segment & Category Form</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            padding: 40px;
-        }
+<title>Segment & Category Form</title>
 
-        .container {
-            width: 650px;
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #e3f2fd, #f4f6f9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
 
-        select, input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
+.container {
+    width: 600px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
 
-        .hidden { display: none; }
+h2 {
+    text-align: center;
+    color: #007bff;
+}
 
-        .info-box {
-            background-color: #eef4ff;
-            padding: 12px;
-            border-left: 4px solid #007bff;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
+label {
+    font-weight: 600;
+}
 
-        .checklist-section {
-            margin-top: 15px;
-            margin-bottom: 30px;
-        }
+select, textarea, input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+}
 
-        .checklist-section label {
-            display: block;
-            margin-bottom: 10px;
-        }
+select:focus, textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0,123,255,0.3);
+    outline: none;
+}
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+.hidden { display:none; }
 
-        button:hover { background-color: #0056b3; }
+.info-box {
+    background: #eef4ff;
+    padding: 12px;
+    border-left: 4px solid #007bff;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
 
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
+/* Checklist styling */
+#checkItems label {
+    display: block;
+    margin-bottom: 8px;
+    padding: 6px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
 
-        .result {
-            margin-top: 20px;
-            padding: 12px;
-            background-color: #e9f7ef;
-            border-radius: 5px;
-            display: none;
-        }
-    </style>
+#checkItems label:hover {
+    background: #e2e6ea;
+}
+
+#checkItems input {
+    margin-right: 8px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+.error {
+    color: red;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.result {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    display: none;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
-<h2>Segment & Category Form</h2>
 
-<div class="error" id="errorMsg"></div>
+<h2>Membership Eligibility Form</h2>
+
+<div id="errorMsg" class="error"></div>
 
 <label>Segment</label>
 <select id="segment">
@@ -100,9 +136,19 @@
 </select>
 </div>
 
-<div id="checklistSection" class="checklist-section hidden">
+<!-- Checklist FIRST -->
+<div id="checklistSection" class="hidden">
 <h3>Checklist</h3>
 <div id="checkItems"></div>
+</div>
+
+<!-- Treasury Question AFTER CHECKLIST -->
+<div id="treasurySection" class="hidden">
+<label>What is the structure of your treasury department?</label>
+<textarea id="treasuryStructure"
+rows="4"
+placeholder="Example: Front Office, Mid Office and Back Office segregation...">
+</textarea>
 </div>
 
 <div id="fileSection" class="hidden">
@@ -114,88 +160,101 @@
 <button onclick="submitForm()">Check Eligibility</button>
 </div>
 
-<div class="result" id="result"></div>
+<div id="result" class="result"></div>
 
 </div>
 
 <script>
 
-const segment = document.getElementById("segment");
-const category = document.getElementById("category");
-const segmentInfo = document.getElementById("segmentInfo");
-const categorySection = document.getElementById("categorySection");
-const checklistSection = document.getElementById("checklistSection");
-const fileSection = document.getElementById("fileSection");
-const submitSection = document.getElementById("submitSection");
-const checkItems = document.getElementById("checkItems");
-const errorMsg = document.getElementById("errorMsg");
-const result = document.getElementById("result");
+const segment=document.getElementById("segment");
+const category=document.getElementById("category");
+const segmentInfo=document.getElementById("segmentInfo");
+const categorySection=document.getElementById("categorySection");
+const checklistSection=document.getElementById("checklistSection");
+const treasurySection=document.getElementById("treasurySection");
+const treasuryStructure=document.getElementById("treasuryStructure");
+const fileSection=document.getElementById("fileSection");
+const submitSection=document.getElementById("submitSection");
+const checkItems=document.getElementById("checkItems");
+const errorMsg=document.getElementById("errorMsg");
+const result=document.getElementById("result");
 
-const segmentDescriptions = {
-"Securities": `The securities market segment involves trading of financial instruments like equity and debt.`,
-"Treps": `TREPS is a secured short-term money market instrument used for liquidity management.`,
-"Derivatives": `Derivatives derive value from underlying assets like stocks and indices.`
+const segmentDescriptions={
+"Securities":"The securities market segment involves trading of financial instruments like equity and debt.",
+"Treps":"TREPS is a secured short-term money market instrument used for liquidity management.",
+"Derivatives":"Derivatives derive value from underlying assets."
 };
 
-const checklistData = {
-"Cooperative Bank": [
+const checklistData={
+"Cooperative Bank":[
 "Do have SGL account with RBI",
 "Have networth more than 200 CR"
 ],
-"Mutual Fund": [
+"Mutual Fund":[
 "Has Settlement bank with one of the Clearing member",
 "Is regulated by SEBI"
 ],
-"Foreign Bank": [
+"Foreign Bank":[
 "Do have SGL account with RBI",
 "Have networth more than 200 CR",
 "Should be listed entity"
 ]
 };
 
-segment.addEventListener("change", function () {
+/* Segment Change */
+segment.addEventListener("change",function(){
 
-category.value = "";
+category.value="";
 resetBelowCategory();
 
-if (segment.value !== "") {
+treasurySection.classList.add("hidden");
+treasuryStructure.value="";
+
+if(segment.value!==""){
 segmentInfo.classList.remove("hidden");
-segmentInfo.innerText = segmentDescriptions[segment.value];
+segmentInfo.innerText=segmentDescriptions[segment.value];
 categorySection.classList.remove("hidden");
 }
-else {
+else{
 segmentInfo.classList.add("hidden");
 categorySection.classList.add("hidden");
 }
 });
 
-category.addEventListener("change", function () {
+/* Category Change */
+category.addEventListener("change",function(){
 
-checkItems.innerHTML = "";
+checkItems.innerHTML="";
+treasuryStructure.value="";
 
-if (category.value !== "") {
+if(category.value!==""){
 
 checklistSection.classList.remove("hidden");
-fileSection.classList.remove("hidden");
-submitSection.classList.remove("hidden");
 
+/* Load checklist */
 checklistData[category.value].forEach(function(item){
 
-const label = document.createElement("label");
-const checkbox = document.createElement("input");
+const label=document.createElement("label");
+const checkbox=document.createElement("input");
 
-checkbox.type = "checkbox";
-checkbox.value = item;
+checkbox.type="checkbox";
+checkbox.value=item;
 
 label.appendChild(checkbox);
-label.appendChild(document.createTextNode(" " + item));
+label.appendChild(document.createTextNode(item));
 
 checkItems.appendChild(label);
-
 });
+
+/* Show treasury AFTER checklist */
+treasurySection.classList.remove("hidden");
+
+fileSection.classList.remove("hidden");
+submitSection.classList.remove("hidden");
 }
-else {
+else{
 resetBelowCategory();
+treasurySection.classList.add("hidden");
 }
 });
 
@@ -206,13 +265,19 @@ submitSection.classList.add("hidden");
 checkItems.innerHTML="";
 }
 
+/* Eligibility Check */
 function submitForm(){
 
 errorMsg.innerHTML="";
 result.style.display="none";
 
-const allCheckboxes =
-document.querySelectorAll("#checkItems input");
+if(treasuryStructure.value.trim()===""){
+errorMsg.innerHTML=
+"Please describe the structure of your treasury department.";
+return;
+}
+
+const allCheckboxes=document.querySelectorAll("#checkItems input");
 
 let uncheckedReasons=[];
 
@@ -224,9 +289,9 @@ uncheckedReasons.push(box.value);
 
 result.style.display="block";
 
-/* ✅ ELIGIBLE */
 if(uncheckedReasons.length===0){
 
+result.style.background="#d4edda";
 result.innerHTML=`
 <strong style="color:green;">
 ✅ You are eligible.
@@ -235,18 +300,15 @@ Requirement has been sent to your registered mail ID.<br>
 Application has been forwarded to Membership Department.
 `;
 }
-
-/* ❌ NOT ELIGIBLE */
 else{
 
 let reasonList="<ul>";
-
 uncheckedReasons.forEach(function(reason){
 reasonList+=`<li>${reason}</li>`;
 });
-
 reasonList+="</ul>";
 
+result.style.background="#f8d7da";
 result.innerHTML=`
 <strong style="color:red;">
 ❌ You are NOT eligible.
