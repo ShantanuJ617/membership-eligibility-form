@@ -1,109 +1,263 @@
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
-    padding: 40px;
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Segment & Category Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            padding: 40px;
+        }
+
+        .container {
+            width: 650px;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        select, input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .hidden { display: none; }
+
+        .info-box {
+            background-color: #eef4ff;
+            padding: 12px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .checklist-section {
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+
+        .checklist-section label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover { background-color: #0056b3; }
+
+        .error {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #e9f7ef;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Segment & Category Form</h2>
+
+<div class="error" id="errorMsg"></div>
+
+<label>Segment</label>
+<select id="segment">
+<option value="">-- Select Segment --</option>
+<option value="Securities">Securities</option>
+<option value="Treps">Treps</option>
+<option value="Derivatives">Derivatives</option>
+</select>
+
+<div id="segmentInfo" class="info-box hidden"></div>
+
+<div id="categorySection" class="hidden">
+<label>Category</label>
+<select id="category">
+<option value="">-- Select Category --</option>
+<option value="Cooperative Bank">Cooperative Bank</option>
+<option value="Mutual Fund">Mutual Fund</option>
+<option value="Foreign Bank">Foreign Bank</option>
+</select>
+</div>
+
+<div id="checklistSection" class="checklist-section hidden">
+<h3>Checklist</h3>
+<div id="checkItems"></div>
+</div>
+
+<div id="fileSection" class="hidden">
+<label>Upload Supporting Document (Optional)</label>
+<input type="file" id="fileUpload">
+</div>
+
+<div id="submitSection" class="hidden">
+<button onclick="submitForm()">Check Eligibility</button>
+</div>
+
+<div class="result" id="result"></div>
+
+</div>
+
+<script>
+
+const segment = document.getElementById("segment");
+const category = document.getElementById("category");
+const segmentInfo = document.getElementById("segmentInfo");
+const categorySection = document.getElementById("categorySection");
+const checklistSection = document.getElementById("checklistSection");
+const fileSection = document.getElementById("fileSection");
+const submitSection = document.getElementById("submitSection");
+const checkItems = document.getElementById("checkItems");
+const errorMsg = document.getElementById("errorMsg");
+const result = document.getElementById("result");
+
+const segmentDescriptions = {
+"Securities": `The securities market segment involves trading of financial instruments like equity and debt.`,
+"Treps": `TREPS is a secured short-term money market instrument used for liquidity management.`,
+"Derivatives": `Derivatives derive value from underlying assets like stocks and indices.`
+};
+
+const checklistData = {
+"Cooperative Bank": [
+"Do have SGL account with RBI",
+"Have networth more than 200 CR"
+],
+"Mutual Fund": [
+"Has Settlement bank with one of the Clearing member",
+"Is regulated by SEBI"
+],
+"Foreign Bank": [
+"Do have SGL account with RBI",
+"Have networth more than 200 CR",
+"Should be listed entity"
+]
+};
+
+segment.addEventListener("change", function () {
+
+category.value = "";
+resetBelowCategory();
+
+if (segment.value !== "") {
+segmentInfo.classList.remove("hidden");
+segmentInfo.innerText = segmentDescriptions[segment.value];
+categorySection.classList.remove("hidden");
+}
+else {
+segmentInfo.classList.add("hidden");
+categorySection.classList.add("hidden");
+}
+});
+
+category.addEventListener("change", function () {
+
+checkItems.innerHTML = "";
+
+if (category.value !== "") {
+
+checklistSection.classList.remove("hidden");
+fileSection.classList.remove("hidden");
+submitSection.classList.remove("hidden");
+
+checklistData[category.value].forEach(function(item){
+
+const label = document.createElement("label");
+const checkbox = document.createElement("input");
+
+checkbox.type = "checkbox";
+checkbox.value = item;
+
+label.appendChild(checkbox);
+label.appendChild(document.createTextNode(" " + item));
+
+checkItems.appendChild(label);
+
+});
+}
+else {
+resetBelowCategory();
+}
+});
+
+function resetBelowCategory(){
+checklistSection.classList.add("hidden");
+fileSection.classList.add("hidden");
+submitSection.classList.add("hidden");
+checkItems.innerHTML="";
 }
 
-/* Smooth fade-in animation */
-@keyframes fadeSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+function submitForm(){
+
+errorMsg.innerHTML="";
+result.style.display="none";
+
+const allCheckboxes =
+document.querySelectorAll("#checkItems input");
+
+let uncheckedReasons=[];
+
+allCheckboxes.forEach(function(box){
+if(!box.checked){
+uncheckedReasons.push(box.value);
+}
+});
+
+result.style.display="block";
+
+/* ✅ ELIGIBLE */
+if(uncheckedReasons.length===0){
+
+result.innerHTML=`
+<strong style="color:green;">
+✅ You are eligible.
+</strong><br><br>
+Requirement has been sent to your registered mail ID.<br>
+Application has been forwarded to Membership Department.
+`;
 }
 
-.container {
-    width: 650px;
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    animation: fadeSlideIn 0.6s ease-in-out;
+/* ❌ NOT ELIGIBLE */
+else{
+
+let reasonList="<ul>";
+
+uncheckedReasons.forEach(function(reason){
+reasonList+=`<li>${reason}</li>`;
+});
+
+reasonList+="</ul>";
+
+result.innerHTML=`
+<strong style="color:red;">
+❌ You are NOT eligible.
+</strong><br><br>
+<b>Reasons:</b>
+${reasonList}
+`;
+}
 }
 
-select, input[type="file"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    transition: all 0.3s ease;
-}
+</script>
 
-/* Dropdown focus animation */
-select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 8px rgba(0,123,255,0.4);
-    transform: scale(1.02);
-}
-
-/* Smooth section appearance */
-.animate {
-    animation: fadeSlideIn 0.5s ease-in-out;
-}
-
-.hidden {
-    display: none;
-}
-
-.info-box {
-    background-color: #eef4ff;
-    padding: 12px;
-    border-left: 4px solid #007bff;
-    margin-bottom: 20px;
-    border-radius: 4px;
-}
-
-.checklist-section {
-    margin-top: 15px;
-    margin-bottom: 30px;
-}
-
-.checklist-section label {
-    display: block;
-    margin-bottom: 10px;
-    transition: transform 0.2s ease;
-}
-
-/* Checkbox hover animation */
-.checklist-section label:hover {
-    transform: translateX(5px);
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.error {
-    color: red;
-    margin-bottom: 10px;
-}
-
-.result {
-    margin-top: 20px;
-    padding: 12px;
-    background-color: #e9f7ef;
-    border-radius: 5px;
-    display: none;
-    animation: fadeSlideIn 0.5s ease-in-out;
-}
-</style>
+</body>
+</html>
